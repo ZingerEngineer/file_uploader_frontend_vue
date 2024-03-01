@@ -1,9 +1,11 @@
-<script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
-</script>
-
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="wrapper">
+    <uploadField />
+  </div>
 </template>
+
+<style scoped></style>
+
+<script setup lang="ts">
+import uploadField from '../components/uploadField.vue'
+</script>

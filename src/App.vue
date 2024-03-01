@@ -1,39 +1,60 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="wrapper">
+    <header>
+      <div class="title-wrapper">
+        <p class="title">File uploader.</p>
+        <img alt="file uploader logo" class="logo" src="@/assets/logo.svg" />
+      </div>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <div class="nav-wrapper">
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+        </nav>
+      </div>
+    </header>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
 header {
+  display: flex;
   line-height: 1.5;
   max-height: 100vh;
+  flex-direction: column;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+.title-wrapper {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+.title {
+  font-size: 8rem;
 }
 
 .logo {
-  display: block;
-  margin: 0 auto 2rem;
+  width: 10rem;
 }
 
 nav {
   width: 100%;
-  font-size: 12px;
+  font-size: 20px;
   text-align: center;
   margin-top: 2rem;
 }
@@ -67,7 +88,7 @@ nav a:first-of-type {
     margin: 0 2rem 0 0;
   }
 
-  header .wrapper {
+  header .nav-wrapper {
     display: flex;
     place-items: flex-start;
     flex-wrap: wrap;

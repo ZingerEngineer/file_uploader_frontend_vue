@@ -1,12 +1,62 @@
 <template>
-  <div class="inputs-wrapper">
-    <input type="file" disabled hidden />
-    <input type="text" class="input-text" />
-    <button type="submit" class="insert-button">Insert</button>
+  <div class="upload-field">
+    <div class="inputs-wrapper">
+      <input
+        accept="image/*,audio/*,video/*,text/*"
+        type="file"
+        id="input-file"
+        hidden
+        ref="fileInputFieldRef"
+        @change="fileInputChangeHandler"
+      />
+      <input
+        type="text"
+        id="input-text"
+        class="input-text"
+        disabled
+        ref="textInputFieldRef"
+        placeholder="e.g. file.txt"
+      />
+      <button id="insert-button" class="green-button" @click="handleInsert" v-if="!insertedFile">
+        INSERT
+      </button>
+      <button
+        type="submit"
+        id="upload"
+        class="green-button"
+        :class="{ upload: insertedFile }"
+        @click="handleUpload"
+        v-if="insertedFile"
+      >
+        UPLOAD
+      </button>
+      <button id="cancel" class="red-button" @click="handleCancel" v-if="insertedFile">
+        <font-awesome-icon :icon="faXmark" size="xl" />
+      </button>
+    </div>
+    <div class="upload-field-text">
+      <p>Or drag & drop here!</p>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.upload-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 255, 170, 0.075);
+  width: 50rem;
+  height: 20rem;
+  border: dashed;
+  border-radius: 8px;
+  border-color: var(--color-border-hover);
+  transition-duration: 200ms;
+}
+.upload-field:hover {
+  background-color: rgba(0, 255, 170, 0.13);
+}
 .inputs-wrapper {
   display: flex;
   justify-content: center;
@@ -24,11 +74,19 @@
   transition-duration: 200ms;
   color: white;
   text-overflow: ellipsis;
+  padding-left: 0.5rem;
+  font-size: medium;
+}
+.input-text::placeholder {
+  color: rgb(168, 168, 168);
 }
 .input-text:hover {
   background: rgba(0, 255, 170, 0.274);
 }
-.insert-button {
+.upload {
+  border-radius: 0px 0px 0px 0px !important;
+}
+.green-button {
   cursor: pointer;
   font-size: 1rem;
   height: 3.2rem;
@@ -40,8 +98,67 @@
   font-weight: bold;
   transition-duration: 100ms;
 }
-.insert-button:hover {
+.green-button:hover {
   background-color: rgb(34, 212, 153);
 }
+
+.red-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 3.2rem;
+  background-color: rgb(224, 45, 45);
+  border: none;
+  color: white;
+  border-radius: 0px 4px 4px 0px;
+  padding: 0 1.5rem 0 1.5rem;
+  font-weight: bold;
+  transition-duration: 100ms;
+}
+.red-button:hover {
+  background-color: rgb(255, 60, 60);
+}
 </style>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { ref } from 'vue'
+const fileInputFieldRef = ref<HTMLInputElement | null>(null)
+const insertedFile = ref<File | null>(null)
+const textInputFieldRef = ref<HTMLInputElement | null>(null)
+const handleInsert = () => {
+  if (!fileInputFieldRef.value) return
+  fileInputFieldRef.value.click()
+}
+const handleFileDrop = (event: DragEvent) => {
+  event.preventDefault()
+  if (!insertedFile.value) return
+  //TODO: Create drag & drop field functionality.
+  // insertedFile.value = event.dataTransfer?.files[0]
+}
+const fileInputChangeHandler = () => {
+  if (!fileInputFieldRef.value || !fileInputFieldRef.value.files) return
+  insertedFile.value = fileInputFieldRef.value.files[0]
+  if (!textInputFieldRef.value) return
+  textInputFieldRef.value.value = insertedFile.value.name
+}
+const handleUpload = (event: Event) => {
+  event.preventDefault()
+  const formData = new FormData()
+  if (!insertedFile.value) return
+  formData.append('File', insertedFile.value, insertedFile.value.name)
+  fetch('localhost:3000/api/upload-file', {
+    method: 'POST',
+    body: formData,
+    mode: 'no-cors' //for now.
+  })
+}
+const handleCancel = () => {
+  if (!fileInputFieldRef.value || !textInputFieldRef.value) return
+  fileInputFieldRef.value.value = ''
+  insertedFile.value = null
+  textInputFieldRef.value.value = ''
+}
+</script>

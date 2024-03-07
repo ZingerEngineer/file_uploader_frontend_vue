@@ -122,9 +122,12 @@
 }
 </style>
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
+
 const fileInputFieldRef = ref<HTMLInputElement | null>(null)
 const insertedFile = ref<File | null>(null)
 const textInputFieldRef = ref<HTMLInputElement | null>(null)
@@ -132,28 +135,42 @@ const handleInsert = () => {
   if (!fileInputFieldRef.value) return
   fileInputFieldRef.value.click()
 }
-const handleFileDrop = (event: DragEvent) => {
-  event.preventDefault()
-  if (!insertedFile.value) return
-  //TODO: Create drag & drop field functionality.
-  // insertedFile.value = event.dataTransfer?.files[0]
+const notify = () => {
+  toast('Wow so easy !', {
+    autoClose: 1000
+  }) // ToastOptions
 }
+//TODO: Handle file drop
+// const handleFileDrop = (event: DragEvent) => {
+//   event.preventDefault()
+//   if (!insertedFile.value) return
+//   //TODO: Create drag & drop field functionality.
+//   // insertedFile.value = event.dataTransfer?.files[0]
+// }
 const fileInputChangeHandler = () => {
   if (!fileInputFieldRef.value || !fileInputFieldRef.value.files) return
   insertedFile.value = fileInputFieldRef.value.files[0]
   if (!textInputFieldRef.value) return
   textInputFieldRef.value.value = insertedFile.value.name
 }
-const handleUpload = (event: Event) => {
+const handleUpload = async (event: Event) => {
   event.preventDefault()
   const formData = new FormData()
-  if (!insertedFile.value) return
-  formData.append('File', insertedFile.value, insertedFile.value.name)
-  fetch('localhost:3000/api/upload-file', {
-    method: 'POST',
-    body: formData,
-    mode: 'no-cors' //for now.
-  })
+  if (!insertedFile.value || !fileInputFieldRef.value || !textInputFieldRef.value) return
+  formData.append('File', insertedFile.value)
+  try {
+    const res = await fetch('http://localhost:3000/file/up_file', {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors' //for now.
+    })
+    console.log(res)
+    fileInputFieldRef.value.value = ''
+    insertedFile.value = null
+    textInputFieldRef.value.value = ''
+  } catch (error) {
+    console.log(error)
+  }
 }
 const handleCancel = () => {
   if (!fileInputFieldRef.value || !textInputFieldRef.value) return
